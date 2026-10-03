@@ -1,0 +1,136 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Shopping Cart</h1>
+    <p class="page-subtitle">Review your selected items and proceed to checkout.</p>
+  </div>
+</div>
+
+<% if (!items || items.length === 0) { %>
+  <div style="text-align: center; padding: 4rem 1rem; background: #fff; border-radius: var(--radius); border: 1px solid var(--border-color);">
+    <p style="font-size: 1.25rem; color: var(--text-muted); margin-bottom: 1.5rem;">Your cart is empty.</p>
+    <a href="/" class="btn btn-primary">Start Shopping</a>
+  </div>
+<% } else { %>
+  <div class="cart-layout">
+    <div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Subtotal</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% items.forEach(item => { %>
+              <% 
+                let imgSrc = item.product.image;
+                if (!imgSrc.startsWith('http://') && !imgSrc.startsWith('https://')) {
+                  imgSrc = '/uploads/' + imgSrc;
+                }
+              %>
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 1rem;">
+                    <img src="<%= imgSrc %>" alt="<%= item.product.name %>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                    <a href="/products/<%= item.product.id %>" style="font-weight: 600; color: var(--text-main); text-decoration: none;">
+                      <%= item.product.name %>
+                    </a>
+                  </div>
+                </td>
+                <td>$<%= Number(item.product.price).toFixed(2) %></td>
+                <td>
+                  <form action="/cart/update" method="POST" style="display: flex; align-items: center; gap: 0.4rem; margin: 0;">
+                    <input type="hidden" name="productId" value="<%= item.product.id %>">
+                    <input 
+                      type="number" 
+                      name="quantity" 
+                      value="<%= item.quantity %>" 
+                      min="1" 
+                      max="99" 
+                      class="form-control" 
+                      style="width: 65px; padding: 0.25rem 0.4rem; font-size: 0.9rem;"
+                    >
+                    <button type="submit" class="btn btn-outline btn-sm" title="Update quantity" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Update</button>
+                  </form>
+                </td>
+                <td style="font-weight: 600;">$<%= (item.product.price * item.quantity).toFixed(2) %></td>
+                <td>
+                  <form action="/cart/remove" method="POST" style="margin: 0;">
+                    <input type="hidden" name="productId" value="<%= item.product.id %>">
+                    <button type="submit" class="btn btn-danger btn-sm" style="padding: 0.25rem 0.5rem;">Remove</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top: 1rem; display: flex; justify-content: space-between;">
+        <a href="/" class="btn btn-outline btn-sm">&larr; Continue Shopping</a>
+        <form action="/cart/clear" method="POST">
+          <button type="submit" class="btn btn-outline btn-sm" style="color: var(--danger);">Clear Cart</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Checkout / Summary -->
+    <div class="cart-summary-card">
+      <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem;">Order Summary</h2>
+      
+      <div class="summary-row">
+        <span>Items Subtotal</span>
+        <span>$<%= totalAmount.toFixed(2) %></span>
+      </div>
+      <div class="summary-row">
+        <span>Shipping</span>
+        <span style="color: var(--success); font-weight: 600;">FREE</span>
+      </div>
+      <div class="summary-total">
+        <span>Total</span>
+        <span>$<%= totalAmount.toFixed(2) %></span>
+      </div>
+
+      <% if (currentUser) { %>
+        <form action="/checkout" method="POST">
+          <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem;">Simulated Payment</h3>
+          
+          <div class="form-group">
+            <label class="form-label">Card Number (Simulated)</label>
+            <input type="text" class="form-control" value="4242 •••• •••• 4242" readonly>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+            <div style="flex: 1;">
+              <label class="form-label">Expiry</label>
+              <input type="text" class="form-control" value="12/28" readonly>
+            </div>
+            <div style="flex: 1;">
+              <label class="form-label">CVV</label>
+              <input type="text" class="form-control" value="888" readonly>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem;">
+            Pay $<%= totalAmount.toFixed(2) %> & Place Order
+          </button>
+        </form>
+      <% } else { %>
+        <div style="background-color: #f1f5f9; padding: 1rem; border-radius: var(--radius); text-align: center;">
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+            You need to be logged in to checkout.
+          </p>
+          <a href="/login?redirect=/cart" class="btn btn-primary btn-block">Login to Checkout</a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+<% } %>
+
+<%- include('partials/footer') %>

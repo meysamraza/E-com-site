@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' | DevOps Shop' : 'DevOps Shop - Gear for Engineers' %></title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand">
+        <span>⚙️</span> DevOps Shop
+      </a>
+
+      <div class="nav-search">
+        <form action="/" method="GET" class="search-form">
+          <input 
+            type="text" 
+            name="q" 
+            placeholder="Search products..." 
+            value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" 
+            class="search-input"
+          >
+          <button type="submit" class="btn btn-outline btn-sm">Search</button>
+        </form>
+      </div>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link">Shop</a></li>
+          <li>
+            <a href="/cart" class="nav-link">
+              🛒 Cart 
+              <% if (cartCount > 0) { %>
+                <span class="badge"><%= cartCount %></span>
+              <% } %>
+            </a>
+          </li>
+
+          <% if (currentUser) { %>
+            <li><a href="/orders" class="nav-link">My Orders</a></li>
+            <% if (currentUser.role === 'admin') { %>
+              <li><a href="/admin" class="nav-link" style="color: #7c3aed; font-weight: 600;">⚡ Admin</a></li>
+            <% } %>
+            <li><span class="nav-link" style="color: #0f172a; font-weight: 600;">👤 <%= currentUser.name %></span></li>
+            <li><a href="/logout" class="btn btn-outline btn-sm">Logout</a></li>
+          <% } else { %>
+            <li><a href="/login" class="nav-link">Login</a></li>
+            <li><a href="/register" class="btn btn-primary btn-sm">Sign Up</a></li>
+          <% } %>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <% if (typeof alertMessage !== 'undefined' && alertMessage) { %>
+      <div class="alert alert-success">
+        <%= alertMessage %>
+      </div>
+    <% } %>
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+      <div class="alert alert-error">
+        <%= errorMessage %>
+      </div>
+    <% } %>

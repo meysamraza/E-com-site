@@ -1,0 +1,48 @@
+<%- include('partials/header') %>
+
+<div style="margin-bottom: 1.5rem;">
+  <a href="/" class="btn btn-outline btn-sm">&larr; Back to Shop</a>
+</div>
+
+<div class="product-detail-container">
+  <div>
+    <% 
+      let imgSrc = product.image;
+      if (!imgSrc.startsWith('http://') && !imgSrc.startsWith('https://')) {
+        imgSrc = '/uploads/' + imgSrc;
+      }
+    %>
+    <img src="<%= imgSrc %>" alt="<%= product.name %>" class="product-detail-img">
+  </div>
+
+  <div class="product-detail-info">
+    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;"><%= product.name %></h1>
+    <div class="detail-price">$<%= Number(product.price).toFixed(2) %></div>
+    
+    <p class="detail-desc"><%= product.description %></p>
+
+    <form action="/cart/add" method="POST" style="margin-top: auto; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+      <input type="hidden" name="productId" value="<%= product.id %>">
+      
+      <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem;">
+        <label for="quantity" style="font-weight: 600;">Quantity:</label>
+        <input 
+          type="number" 
+          id="quantity" 
+          name="quantity" 
+          value="1" 
+          min="1" 
+          max="99" 
+          class="form-control" 
+          style="width: 80px;"
+        >
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1.1rem;">
+        Add to Cart
+      </button>
+    </form>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

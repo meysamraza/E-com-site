@@ -1,0 +1,53 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Order History</h1>
+    <p class="page-subtitle">Track your past purchases and order status.</p>
+  </div>
+</div>
+
+<% if (!orders || orders.length === 0) { %>
+  <div style="text-align: center; padding: 4rem 1rem; background: #fff; border-radius: var(--radius); border: 1px solid var(--border-color);">
+    <p style="font-size: 1.25rem; color: var(--text-muted); margin-bottom: 1.5rem;">You have not placed any orders yet.</p>
+    <a href="/" class="btn btn-primary">Start Shopping</a>
+  </div>
+<% } else { %>
+  <% orders.forEach(order => { %>
+    <div class="order-card">
+      <div class="order-header">
+        <div>
+          <strong>Order #<%= order.id %></strong>
+          <span style="color: var(--text-muted); margin-left: 0.75rem;">
+            <%= new Date(order.created_at).toLocaleString() %>
+          </span>
+        </div>
+        <div>
+          <span style="background: #dcfce7; color: #166534; padding: 0.25rem 0.6rem; border-radius: 9999px; font-weight: 600; font-size: 0.8rem;">
+            <%= order.status %>
+          </span>
+        </div>
+      </div>
+      <div class="order-body">
+        <ul style="list-style: none; margin-bottom: 1rem;">
+          <% order.items.forEach(item => { %>
+            <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px dashed var(--border-color);">
+              <span>
+                <strong><%= item.quantity %>x</strong> <%= item.product_name %>
+              </span>
+              <span>$<%= (item.price * item.quantity).toFixed(2) %></span>
+            </li>
+          <% }) %>
+        </ul>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; font-weight: 700; padding-top: 0.5rem;">
+          <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">
+            Payment Method: <%= order.payment_method %>
+          </span>
+          <span>Total: $<%= Number(order.total_amount).toFixed(2) %></span>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+<% } %>
+
+<%- include('partials/footer') %>

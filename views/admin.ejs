@@ -1,0 +1,84 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Admin Dashboard</h1>
+    <p class="page-subtitle">Manage inventory and add new products to the catalog.</p>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: start;">
+  <!-- Add Product Form -->
+  <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow);">
+    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem;">Add New Product</h2>
+    
+    <form action="/admin/products" method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="name" class="form-label">Product Name</label>
+        <input type="text" id="name" name="name" class="form-control" required placeholder="e.g. Mechanical Keyboard">
+      </div>
+
+      <div class="form-group">
+        <label for="price" class="form-label">Price ($ USD)</label>
+        <input type="number" id="price" name="price" step="0.01" min="0.01" class="form-control" required placeholder="99.99">
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" name="description" class="form-control" rows="3" required placeholder="Detailed product specifications..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="image" class="form-label">Product Image (saved to local uploads)</label>
+        <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem;">
+        Upload & Add Product
+      </button>
+    </form>
+  </div>
+
+  <!-- Existing Products Table -->
+  <div>
+    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem;">Current Inventory (<%= products.length %>)</h2>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% products.forEach(product => { %>
+            <% 
+              let imgSrc = product.image;
+              if (!imgSrc.startsWith('http://') && !imgSrc.startsWith('https://')) {
+                imgSrc = '/uploads/' + imgSrc;
+              }
+            %>
+            <tr>
+              <td>
+                <img src="<%= imgSrc %>" alt="<%= product.name %>" style="width: 45px; height: 45px; object-fit: cover; border-radius: 4px;">
+              </td>
+              <td>
+                <strong><%= product.name %></strong>
+              </td>
+              <td>$<%= Number(product.price).toFixed(2) %></td>
+              <td>
+                <form action="/admin/products/<%= product.id %>/delete" method="POST" onsubmit="return confirm('Delete this product?');" style="margin: 0;">
+                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

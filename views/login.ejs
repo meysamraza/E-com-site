@@ -1,0 +1,40 @@
+<%- include('partials/header') %>
+
+<div class="auth-container">
+  <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; text-align: center;">Welcome Back</h1>
+  <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+    Sign in to your DevOps Shop account
+  </p>
+
+  <form action="/login" method="POST">
+    <% if (typeof redirect !== 'undefined' && redirect) { %>
+      <input type="hidden" name="redirect" value="<%= redirect %>">
+    <% } %>
+
+    <div class="form-group">
+      <label for="email" class="form-label">Email Address</label>
+      <input type="email" id="email" name="email" class="form-control" required placeholder="you@example.com">
+    </div>
+
+    <div class="form-group">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" id="password" name="password" class="form-control" required placeholder="••••••••">
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; margin-top: 1rem;">
+      Log In
+    </button>
+  </form>
+
+  <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: var(--text-muted);">
+    Don't have an account? <a href="/register" style="color: var(--primary); font-weight: 600;">Sign up</a>
+  </div>
+
+  <div style="margin-top: 1.5rem; padding: 0.85rem; background-color: #f1f5f9; border-radius: var(--radius); font-size: 0.825rem; color: #475569;">
+    <strong>Demo Credentials:</strong><br>
+    • Student: <code>student@example.com</code> / <code>student123</code><br>
+    • Admin: <code>admin@example.com</code> / <code>admin123</code>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

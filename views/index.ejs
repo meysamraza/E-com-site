@@ -1,0 +1,54 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">
+      <% if (searchQuery) { %>
+        Search Results for "<%= searchQuery %>"
+      <% } else { %>
+        Featured Developer Gear
+      <% } %>
+    </h1>
+    <p class="page-subtitle">High performance peripherals and essentials for cloud & software engineers.</p>
+  </div>
+  <% if (searchQuery) { %>
+    <a href="/" class="btn btn-outline btn-sm">Clear Search</a>
+  <% } %>
+</div>
+
+<% if (products.length === 0) { %>
+  <div style="text-align: center; padding: 4rem 1rem; background: #fff; border-radius: var(--radius); border: 1px solid var(--border-color);">
+    <p style="font-size: 1.25rem; color: var(--text-muted); margin-bottom: 1rem;">No products found.</p>
+    <a href="/" class="btn btn-primary">Browse All Products</a>
+  </div>
+<% } else { %>
+  <div class="product-grid">
+    <% products.forEach(product => { %>
+      <div class="product-card">
+        <% 
+          let imgSrc = product.image;
+          if (!imgSrc.startsWith('http://') && !imgSrc.startsWith('https://')) {
+            imgSrc = '/uploads/' + imgSrc;
+          }
+        %>
+        <a href="/products/<%= product.id %>">
+          <img src="<%= imgSrc %>" alt="<%= product.name %>" class="product-card-img" loading="lazy">
+        </a>
+        <div class="product-card-body">
+          <a href="/products/<%= product.id %>" class="product-title"><%= product.name %></a>
+          <p class="product-desc"><%= product.description %></p>
+          <div class="product-footer">
+            <span class="product-price">$<%= Number(product.price).toFixed(2) %></span>
+            <form action="/cart/add" method="POST" style="margin: 0;">
+              <input type="hidden" name="productId" value="<%= product.id %>">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn-primary btn-sm">Add to Cart</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,35 @@
+<%- include('partials/header') %>
+
+<div class="auth-container">
+  <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; text-align: center;">Create Account</h1>
+  <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+    Join DevOps Shop to track orders and checkout faster
+  </p>
+
+  <form action="/register" method="POST">
+    <div class="form-group">
+      <label for="name" class="form-label">Full Name</label>
+      <input type="text" id="name" name="name" class="form-control" required placeholder="Alex Developer">
+    </div>
+
+    <div class="form-group">
+      <label for="email" class="form-label">Email Address</label>
+      <input type="email" id="email" name="email" class="form-control" required placeholder="alex@example.com">
+    </div>
+
+    <div class="form-group">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" id="password" name="password" class="form-control" minlength="6" required placeholder="At least 6 characters">
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; margin-top: 1rem;">
+      Register
+    </button>
+  </form>
+
+  <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: var(--text-muted);">
+    Already have an account? <a href="/login" style="color: var(--primary); font-weight: 600;">Log in</a>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
