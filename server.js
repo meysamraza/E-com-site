@@ -444,7 +444,6 @@ process.on('unhandledRejection', (reason) => {
 
 // Start Server listening on 0.0.0.0
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on http://0.0.0.0:${PORT}`);
-  console.log(`Health check available at http://0.0.0.0:${PORT}/health`);
+  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Health check available at http://localhost:${PORT}/health`);
 });
-
