@@ -10,7 +10,7 @@ require('dotenv').config();
 const db = require('./db');
 
 const app = express(); // nosemgrep: javascript.express.security.audit.express-check-csurf-middleware-usage.express-check-csurf-middleware-usage
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'devops_jwt_secret_key_change_me';
 
 // Setup file upload destination
