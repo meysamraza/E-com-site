@@ -6,6 +6,14 @@ files:
     destination: /home/ec2-user/E-com-site
 file_exists_behavior: OVERWRITE
 
+permissions:
+  - object: /home/ec2-user/E-com-site
+    owner: ec2-user
+    group: ec2-user
+    type:
+      - file
+      - directory
+
 hooks:
   BeforeInstall:
     - location: deploy/stop.sh
