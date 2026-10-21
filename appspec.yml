@@ -1,0 +1,25 @@
+version: 0.0
+os: linux
+
+files:
+  - source: /
+    destination: /home/ec2-user/E-com-site
+file_exists_behavior: OVERWRITE
+
+hooks:
+  BeforeInstall:
+    - location: deploy/stop.sh
+      timeout: 60
+      runas: ec2-user
+  AfterInstall:
+    - location: deploy/install.sh
+      timeout: 120
+      runas: ec2-user
+  ApplicationStart:
+    - location: deploy/start.sh
+      timeout: 60
+      runas: ec2-user
+  ValidateService:
+    - location: deploy/validate.sh
+      timeout: 60
+      runas: ec2-user
