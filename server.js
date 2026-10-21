@@ -127,7 +127,7 @@ app.get('/', async (req, res) => {
     } else {
       result = await db.query('SELECT * FROM products ORDER BY id ASC');
     }
-    res.render('index', { products: result.rows, searchQuery, title: 'Shop Gear' });
+    res.render('index', { products: result.rows, searchQuery, title: 'Shop hehe' });
   } catch (err) {
     console.error('Error fetching products:', err.message);
     res.render('index', { products: [], searchQuery, title: 'Shop Gear', errorMessage: 'Could not load products. Please ensure the database is initialized.' });
