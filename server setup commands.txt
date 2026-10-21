@@ -1,0 +1,89 @@
+SERVER SETUP COMMANDS (EC2, Amazon Linux 2023, region eu-north-1)
+==================================================================
+
+BEFORE YOU START
+- Attach the IAM role (S3 read + SSM) to the instance BEFORE installing the agent.
+- Open inbound TCP 3000 in the security group.
+
+------------------------------------------------------------------
+1. SETUP (once, after SSH)
+------------------------------------------------------------------
+
+# update and install tools
+sudo dnf update -y
+sudo dnf install -y git nodejs ruby wget
+
+# install CodeDeploy agent (eu-north-1)
+cd ~
+wget https://aws-codedeploy-eu-north-1.s3.eu-north-1.amazonaws.com/latest/install
+chmod +x install
+sudo ./install auto
+sudo systemctl enable --now codedeploy-agent
+
+# app env file (outside the deploy folder)
+cat > ~/app.env <<EOF
+PORT=3000
+EOF
+chmod 600 ~/app.env
+
+# pm2 and app folder
+sudo npm install -g pm2
+mkdir -p ~/E-com-site
+sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u ec2-user --hp /home/ec2-user
+
+# check
+node -v
+pm2 -v
+sudo systemctl status codedeploy-agent --no-pager
+
+------------------------------------------------------------------
+2. ONLY FOR THE DATABASE VERSION (E-com-site repo)
+   Skip this for ecom-demo, it has no database.
+------------------------------------------------------------------
+
+sudo dnf install -y postgresql15 postgresql15-server
+sudo postgresql-setup --initdb
+sudo systemctl enable --now postgresql
+DBPASS=$(openssl rand -hex 12)
+sudo -u postgres psql -c "CREATE USER appuser WITH PASSWORD '$DBPASS';"
+sudo -u postgres psql -c "CREATE DATABASE shop OWNER appuser;"
+sudo sed -i 's/ident$/scram-sha-256/' /var/lib/pgsql/data/pg_hba.conf
+sudo systemctl restart postgresql
+
+cat > ~/app.env <<EOF
+PORT=3000
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=shop
+DB_USER=appuser
+DB_PASSWORD=$DBPASS
+JWT_SECRET=$(openssl rand -hex 32)
+EOF
+chmod 600 ~/app.env
+
+git clone https://github.com/meysamraza/E-com-site.git /tmp/repo
+cd /tmp/repo
+PGPASSWORD=$DBPASS psql -h localhost -U appuser -d shop -f schema.sql -f seed.sql
+cd ~ && rm -rf /tmp/repo
+
+------------------------------------------------------------------
+3. VERIFY AFTER DEPLOY
+------------------------------------------------------------------
+
+pm2 list
+curl http://localhost:3000/health
+
+Browser: http://SERVER-PUBLIC-IP:3000
+
+------------------------------------------------------------------
+4. TROUBLESHOOTING
+------------------------------------------------------------------
+
+# CodeDeploy agent log
+sudo tail -30 /var/log/aws/codedeploy-agent/codedeploy-agent.log
+
+# "Missing credentials" error: agent started before the IAM role was attached
+sudo systemctl restart codedeploy-agent
+
+# permission denied (EACCES) during deploy
+sudo chown -R ec2-user:ec2-user /home/ec2-user/E-com-site
