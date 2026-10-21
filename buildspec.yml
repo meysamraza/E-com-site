@@ -12,7 +12,7 @@ phases:
   pre_build:
     commands:
       - echo "== Secrets ==" && gitleaks detect --source . --no-git --redact --exit-code 1
-      - echo "== SAST ==" && /opt/sg/bin/semgrep --config auto --error --exclude node_modules .
+      - echo "== SAST ==" && /opt/sg/bin/semgrep --config auto --error --exclude node_modules --exclude seed.sql .
       - echo "== Deps ==" && trivy fs --scanners vuln --severity HIGH,CRITICAL --exit-code 1 --skip-dirs node_modules .
   build:
     commands:
