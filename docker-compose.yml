@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: ChangeMe123
+      POSTGRES_DB: shop
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: shop
+      DB_USER: appuser
+      DB_PASSWORD: ChangeMe123
+      JWT_SECRET: change_this_secret
+    depends_on:
+      - db
+
+volumes:
+  dbdata:
