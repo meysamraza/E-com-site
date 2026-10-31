@@ -18,7 +18,7 @@ const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const multerS3 = require('multer-s3');
 
 const s3 = new S3Client({ region: 'ap-south-1' });
-const BUCKET = 'ecom-uploads-mumbai-meysam';
+const BUCKET = 'ecom-uploads-mumbai-611182198012';
 
 const upload = multer({
   storage: multerS3({
