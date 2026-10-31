@@ -13,21 +13,25 @@ const app = express(); // nosemgrep: javascript.express.security.audit.express-c
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'devops_jwt_secret_key_change_me';
 
-// Setup file upload destination
-const uploadDir = path.join(__dirname, 'public', 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Setup file upload destination (S3)
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+const multerS3 = require('multer-s3');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'product-' + uniqueSuffix + ext);
-  }
+const s3 = new S3Client({ region: 'ap-south-1' });
+const BUCKET = 'ecom-uploads-mumbai-meysam';
+
+const upload = multer({
+  storage: multerS3({
+    s3,
+    bucket: BUCKET,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    key: (req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, 'product-' + uniqueSuffix + ext);
+    }
+  })
 });
-const upload = multer({ storage });
 
 // View engine & static files
 app.set('view engine', 'ejs');
@@ -36,6 +40,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+
+// Serve uploaded images from S3 (local public/uploads files still win first)
+app.get('/uploads/:key', async (req, res) => {
+  try {
+    const out = await s3.send(new GetObjectCommand({ Bucket: BUCKET, Key: req.params.key }));
+    res.set('Content-Type', out.ContentType);
+    out.Body.pipe(res);
+  } catch (e) {
+    res.status(404).end();
+  }
+});
 
 // Cart cookie helpers
 function getCart(req) {
@@ -407,7 +422,7 @@ app.post('/admin/products', requireAdmin, upload.single('image'), async (req, re
   }
 
   try {
-    const imageName = req.file.filename;
+    const imageName = req.file.key;
     await db.query(
       'INSERT INTO products (name, description, price, image) VALUES ($1, $2, $3, $4)',
       [name.trim(), description ? description.trim() : '', parseFloat(price), imageName]

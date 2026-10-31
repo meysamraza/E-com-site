@@ -9,6 +9,7 @@
     "db:init": "node scripts/init-db.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1161.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.4.5",
@@ -16,6 +17,7 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.4.0",
+    "multer-s3": "^3.0.1",
     "pg": "^8.11.5"
   }
 }
