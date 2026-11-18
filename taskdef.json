@@ -1,0 +1,34 @@
+{
+  "family": "e-com-task",
+  "networkMode": "bridge",
+  "requiresCompatibilities": ["EC2"],
+  "cpu": "512",
+  "memory": "700",
+  "executionRoleArn": "arn:aws:iam::267447890852:role/ecsTaskExec",
+  "containerDefinitions": [
+    {
+      "name": "app",
+      "image": "<IMAGE1_NAME>",
+      "essential": true,
+      "command": ["sh", "-c", "npm run db:init && node server.js"],
+      "portMappings": [{ "containerPort": 3000, "hostPort": 0, "protocol": "tcp" }],
+      "environment": [
+        { "name": "PORT", "value": "3000" },
+        { "name": "DB_HOST", "value": "ecom-db.cn8g0a88qbnx.ap-south-1.rds.amazonaws.com" },
+        { "name": "DB_PORT", "value": "5432" },
+        { "name": "DB_NAME", "value": "shop" },
+        { "name": "DB_USER", "value": "appuser" },
+        { "name": "DB_PASSWORD", "value": "ChangeMe123" },
+        { "name": "JWT_SECRET", "value": "change_this_secret" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/e-com-task",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "app"
+        }
+      }
+    }
+  ]
+}

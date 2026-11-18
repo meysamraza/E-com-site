@@ -1,0 +1,22 @@
+version: 0.2
+env:
+  variables:
+    AWS_REGION: ap-south-1
+    ECR_REPO: e-com-app
+phases:
+  pre_build:
+    commands:
+      - ACC=$(aws sts get-caller-identity --query Account --output text)
+      - REG=$ACC.dkr.ecr.$AWS_REGION.amazonaws.com
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REG
+      - TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-7)
+  build:
+    commands:
+      - docker build -t $REG/$ECR_REPO:$TAG .
+  post_build:
+    commands:
+      - docker push $REG/$ECR_REPO:$TAG
+      - printf '{"ImageURI":"%s"}' $REG/$ECR_REPO:$TAG > imageDetail.json
+artifacts:
+  files:
+    - imageDetail.json
