@@ -1,4 +1,4 @@
-﻿{
+{
   "family": "e-com-task",
   "networkMode": "bridge",
   "requiresCompatibilities": ["EC2"],
