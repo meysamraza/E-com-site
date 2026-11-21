@@ -1,6 +1,6 @@
 FROM public.ecr.aws/docker/library/node:20-slim
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
-RUN npm install -g npm@latest
+RUN npm install -g npm@10
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
