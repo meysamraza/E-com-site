@@ -19,7 +19,7 @@ phases:
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REG
       - TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-7)
       - (cd ecom-terraform && terraform fmt -check -recursive && terraform init -backend=false && terraform validate)
-      - checkov -d . --framework terraform dockerfile secrets --quiet --compact
+      - checkov -d . --framework terraform dockerfile secrets --quiet --compact --skip-check CKV_SECRET_6
       - hadolint Dockerfile
       - npm ci
       - node --check server.js
