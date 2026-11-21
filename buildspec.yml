@@ -4,15 +4,30 @@ env:
     AWS_REGION: ap-south-1
     ECR_REPO: e-com-app
 phases:
+  install:
+    commands:
+      - curl -fsSL -o tf.zip https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
+      - unzip -o tf.zip -d /usr/local/bin
+      - pip install checkov
+      - curl -fsSL -o /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64
+      - chmod +x /usr/local/bin/hadolint
+      - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
   pre_build:
     commands:
       - ACC=$(aws sts get-caller-identity --query Account --output text)
       - REG=$ACC.dkr.ecr.$AWS_REGION.amazonaws.com
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REG
       - TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-7)
+      - (cd ecom-terraform && terraform fmt -check -recursive && terraform init -backend=false && terraform validate)
+      - checkov -d . --framework terraform dockerfile secrets --quiet --compact
+      - hadolint Dockerfile
+      - npm ci
+      - node --check server.js
+      - npm audit --audit-level=high
   build:
     commands:
       - docker build -t $REG/$ECR_REPO:$TAG .
+      - trivy image --exit-code 1 --severity CRITICAL --ignore-unfixed $REG/$ECR_REPO:$TAG
   post_build:
     commands:
       - docker push $REG/$ECR_REPO:$TAG
